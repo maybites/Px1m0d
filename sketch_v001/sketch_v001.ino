@@ -1,3 +1,33 @@
+/* How many shift register chips are daisy-chained.
+*/
+#define NUMBER_OF_SHIFT_CHIPS   2
+
+/* Width of data (how many ext lines).
+*/
+#define DATA_WIDTH   NUMBER_OF_SHIFT_CHIPS * 8
+
+/* Width of pulse to trigger the shift register to read and latch.
+*/
+#define PULSE_WIDTH_USEC   5
+
+/* Optional delay between shift register reads.
+*/
+#define POLL_DELAY_MSEC   1
+
+typedef struct
+ {
+     boolean pluggedIn;
+     boolean pressed;
+     boolean light;
+     byte lampDir;
+     int lampId;
+ }  plug_type;
+
+/**********************************
+  PLUG ARRAY, where the formula is
+        plugs[row * 8 + col];
+***********************************/
+plug_type plugs[64];
 
 /**********************************
   LAMP ID - Analog Input Multiplex
@@ -22,12 +52,55 @@ http://www.gammon.com.au/forum/?id=11976
 
 //Array with the Analog Pin Numbers for each Lamp Row.
 const byte MSensorRow[8] = {A0, A1, A2, A3, A4, A5, A6, A7};
+//Array with the MUX - PinID for a Lamp colum.
 const byte MSensorCol[8] = {3, 0, 1, 2, 4, 6, 7, 5};
 
 //Pin address for setting the Multiplexer
 const byte MAddressPinA = 5;
 const byte MAddressPinB = 6;
 const byte MAddressPinC = 7;
+
+/**********************************
+  Socket - Digital Shift Input 
+***********************************/
+
+const byte IN1_clockPin = 18;
+const byte IN1_dataPin  = 19;
+const byte IN1_loadPin  = 17;
+
+//Mapping Array with the MUX - PinID for a Lamp colum.
+const byte IN1_RegisterBitRow[16] = {8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7};
+
+//Mapping Array to geth the BitId 
+const byte socket_pressedBit[8] = {0, 2, 4, 6, 8, 10, 12, 14};
+const byte socket_puggedInBit[8] = {1, 3, 5, 7, 9, 11, 13, 15};
+
+// storage for the scanned shift-ins
+unsigned int socketRow[8];
+
+
+/**********************************
+  LAMP DIR - Digital Shift Input 
+***********************************/
+
+const byte IN2_clockPin = 15;
+const byte IN2_dataPin  = 16;
+const byte IN2_loadPin  = 14;
+
+//Mapping Array with the MUX - PinID for a Lamp colum.
+const byte IN2_RegisterBitRow[16] = {8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7};
+
+// storage for the scanned shift-ins
+unsigned int directionRow[8];
+
+
+/**********************************
+  LAMP LIGHT - Digital output 
+***********************************/
+
+const byte OUT_ser  = 4;
+const byte OUT_sclk = 3;
+const byte OUT_rclk = 2;
 
 /*************************
   LiquidCrystal Library
