@@ -5,20 +5,9 @@
 //get the condition of the specified socket. 
 // returns 1 if a socket is pressed (no matter if a lamp is plugged in)
 byte getDirection(const byte _row, const byte _column){
-    char buffer[BUF_SIZE];
-    buffer[BUF_SIZE - 1] = '\0';
-
-  unsigned int mask = 3 << _column;
+  unsigned int mask = 3 << (_column * 2);
   unsigned int added = directionRow[_row] & mask;
-
-  int2bin(mask, buffer, BUF_SIZE - 1);
-  Serial.print("bits");
-  Serial.println(buffer);
-  int2bin(directionRow[_row], buffer, BUF_SIZE - 1);
-  Serial.print("bits");
-  Serial.println(buffer);
-
-  return added >> _column;
+  return direction_BitMapping[added >> (_column * 2)];
 }
 
 // this method scans the whole board for the pluggedin / pressed - PlugData

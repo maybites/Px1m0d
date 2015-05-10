@@ -14,6 +14,14 @@
 */
 #define POLL_DELAY_MSEC   1
 
+/* Def for LampID */
+// defines how many measurements for one cycle are needed
+#define MSTORE_SIZE 30
+// defines the maximum measurmement cycles 
+#define MSTORE_MAX_CYCLES 30
+// defines the delay between each measurement
+#define MSTORE_POLL_DELAY_MSEC 30
+
 typedef struct
  {
      boolean pluggedIn;
@@ -59,6 +67,22 @@ const byte MSensorCol[8] = {3, 0, 1, 2, 4, 6, 7, 5};
 const byte MAddressPinA = 5;
 const byte MAddressPinB = 6;
 const byte MAddressPinC = 7;
+ 
+// storage of the measurement cycle
+int lampID_MCyc_Store[MSTORE_SIZE];
+// measurement cycle index
+int lampID_MCyc_index = 0;
+// counter of completed measurement cycles
+int lampID_FirstMCyc_complete = 0;
+// measurement active flag
+boolean lampID_MCyc_active = false;
+// lamp row to poll
+byte lampID_row;
+// lamp column to poll
+byte lampID_column;
+// last polling time
+unsigned long lampID_lastPollMSec;
+
 
 /**********************************
   Socket - Digital Shift Input 
@@ -89,6 +113,12 @@ const byte IN2_loadPin  = 14;
 
 //Mapping Array with the MUX - PinID for a Lamp colum.
 const byte IN2_RegisterBitRow[16] = {8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7};
+
+//Mapping Array to swap the two direction bits
+// and set values corresponding direction 
+// {down, up, right, left}
+//const byte direction_BitCorrection[4] = {0, 2, 1, 3};
+const byte direction_BitMapping[4] = {6, 12, 3, 9};
 
 // storage for the scanned shift-ins
 unsigned int directionRow[8];

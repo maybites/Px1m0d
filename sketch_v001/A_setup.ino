@@ -9,6 +9,11 @@ void setup() {
   pinMode(IN1_clockPin, OUTPUT);
   pinMode(IN1_dataPin, INPUT);
 
+  // Setup Shift IN2
+  pinMode(IN2_loadPin, OUTPUT);
+  pinMode(IN2_clockPin, OUTPUT);
+  pinMode(IN2_dataPin, INPUT);
+
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
   // Print a message to the LCD.
