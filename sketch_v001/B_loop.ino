@@ -16,7 +16,7 @@ void loop() {
       plugs[row * 8 + col].pluggedIn = true;
       plugs[row * 8 + col].lampDir = getDirection(row, col);
       // measure lamp id
-      lampID_start_MCyc(row, col);
+      plugID_start_MCyc(row, col);
     } else if(isSocketPlugged(row, col) && !plugs[row * 8 + col].pluggedIn && isSocketPressed(row, col)){
       plugs[row * 8 + col].pressed = isSocketPressed(row, col);
       //do nothing else
@@ -45,18 +45,30 @@ void loop() {
   }
   
   // Measurement Cycle Loop
-  if(lampID_isMCyc_active()){
-    if(lampID_poll_MCyc()){
-      if(lampID_isWithin_MeanDiff(5)){
+  if(plugID_isMCyc_active()){
+    if(plugID_poll_MCyc()){
+      if(plugID_isWithin_MeanDiff(5)){
         // the measurement was successfull
-        lampID_MCycle_done(true);
+        plugID_MCycle_done(true);
         Serial.println("ID found");
-        LCD_addLamp(lampID_row, lampID_column);
+        switchLamp(plugID_row, plugID_column, 1);
+        delay(300);
+        switchLamp(plugID_row, plugID_column, 0);
+        
+        LCD_addLamp(plugID_row, plugID_column);
         // send data of new plug
       }
     } else {
        // no conclusive ID has been found.
-       lampID_MCycle_done(false);
+       plugID_MCycle_done(false);
+       switchLamp(plugID_row, plugID_column, 1);
+       delay(200);
+       switchLamp(plugID_row, plugID_column, 0);
+       delay(200);
+       switchLamp(plugID_row, plugID_column, 1);
+       delay(200);
+       switchLamp(plugID_row, plugID_column, 0);
+       
        Serial.println("no ID found");
     }
   }
@@ -77,7 +89,7 @@ void LCD_addLamp(const byte _row, const byte _column){
     lcd.print(plugs[_row * 8 + _column].lampDir); 
   }   
   lcd.setCursor(11, 1);
-  lcd.print(plugs[_row * 8 + _column].lampId);
+  lcd.print(plugs[_row * 8 + _column].plugId);
  }
  
  void LCD_delLamp(const byte _row, const byte _column){
@@ -95,5 +107,5 @@ void LCD_addLamp(const byte _row, const byte _column){
     lcd.print(plugs[_row * 8 + _column].lampDir); 
   }   
   lcd.setCursor(11, 1);
-  lcd.print(plugs[_row * 8 + _column].lampId);
+  lcd.print(plugs[_row * 8 + _column].plugId);
  }

@@ -1,5 +1,5 @@
 void setup() {
-  // Setup Multiplex Analog IN for LampID
+  // Setup Multiplex Analog IN for plugId
   pinMode (MAddressPinA, OUTPUT); 
   pinMode (MAddressPinB, OUTPUT); 
   pinMode (MAddressPinC, OUTPUT); 
@@ -13,6 +13,11 @@ void setup() {
   pinMode(IN2_loadPin, OUTPUT);
   pinMode(IN2_clockPin, OUTPUT);
   pinMode(IN2_dataPin, INPUT);
+
+  // Setup Shift OUT
+  pinMode(OUT_latchPin, OUTPUT);
+  pinMode(OUT_clockPin, OUTPUT);
+  pinMode(OUT_dataPin, OUTPUT);
 
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
@@ -29,7 +34,7 @@ void scan() {
   for(byte row = 0; row < 8; row++){
     for(byte col = 0; col < 8; col++){
       if(isSocketPlugged(row, col)){
-        plugs[row * 8 + col].lampId = getLampValue(row, col);
+        plugs[row * 8 + col].plugId = getLampValue(row, col);
         plugs[row * 8 + col].pluggedIn = true;
         plugs[row * 8 + col].lampDir = getDirection(row, col);
 
@@ -40,7 +45,7 @@ void scan() {
         Serial.print(" dir: ");
         Serial.print(plugs[row * 8 + col].lampDir);
         Serial.print(" val: ");
-        Serial.println(plugs[row * 8 + col].lampId);
+        Serial.println(plugs[row * 8 + col].plugId);
 
       }
     }

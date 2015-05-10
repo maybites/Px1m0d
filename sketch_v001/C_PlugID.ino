@@ -3,28 +3,32 @@
 **********************************************/
 
 // checks if a measurement cycle is currently active
-boolean lampID_isMCyc_active(){
-  return lampID_MCyc_active;
+boolean plugID_isMCyc_active(){
+  return plugID_MCyc_active;
 }
 
 /* stops the Measurement cycle. when _store is set to true the current mean value is stored
 */
-void lampID_MCycle_done(boolean _store){
+void plugID_MCycle_done(boolean _store){
   if(_store){
-    plugs[lampID_row * 8 + lampID_column].lampId = lampID_get_Mean();
+    plugs[plugID_row * 8 + plugID_column].plugId = plugID_get_Mean();
   }
-  lampID_MCyc_active = false;
+  plugID_MCyc_active = false;
+  // switches on all the lamps of the row
+  switchOnRow(plugID_row);
 }
 
-/* starts a measurement cycle for the lampID
+/* starts a measurement cycle for the plugId
 */
-void lampID_start_MCyc(const byte _row, const byte _column){
-  lampID_FirstMCyc_complete = 0;
-  lampID_MCyc_active = true;
-  lampID_MCyc_index = 0;
-  lampID_row = _row;
-  lampID_column = _column;
-  lampID_lastPollMSec = millis();
+void plugID_start_MCyc(const byte _row, const byte _column){
+  // switches off all the lamps of the row
+  switchOffRow(_row);
+  plugID_FirstMCyc_complete = 0;
+  plugID_MCyc_active = true;
+  plugID_MCyc_index = 0;
+  plugID_row = _row;
+  plugID_column = _column;
+  plugID_lastPollMSec = millis();
 }
 
 /* polls for another value during the measurment cycle
@@ -34,15 +38,15 @@ void lampID_start_MCyc(const byte _row, const byte _column){
     returns true if it keeps polling, 
             false if the maxiumum measurment cycles have been reached
 */
-boolean lampID_poll_MCyc(){
-  if(lampID_lastPollMSec + MSTORE_POLL_DELAY_MSEC < millis()){
-    lampID_lastPollMSec = millis();
-    lampID_MCyc_Store[lampID_MCyc_index] = getLampValue(lampID_row, lampID_column);
-    lampID_MCyc_index++;
-    if(lampID_MCyc_index ==  MSTORE_SIZE){
-      lampID_MCyc_index = 0;
-      lampID_FirstMCyc_complete++;
-      if(lampID_FirstMCyc_complete >= MSTORE_MAX_CYCLES)
+boolean plugID_poll_MCyc(){
+  if(plugID_lastPollMSec + MSTORE_POLL_DELAY_MSEC < millis()){
+    plugID_lastPollMSec = millis();
+    plugID_MCyc_Store[plugID_MCyc_index] = getLampValue(plugID_row, plugID_column);
+    plugID_MCyc_index++;
+    if(plugID_MCyc_index ==  MSTORE_SIZE){
+      plugID_MCyc_index = 0;
+      plugID_FirstMCyc_complete++;
+      if(plugID_FirstMCyc_complete >= MSTORE_MAX_CYCLES)
         return false;
     }
   }
@@ -53,19 +57,19 @@ boolean lampID_poll_MCyc(){
      before this method tests the collected values, it makes first sure it has the
      number of measuremens specified by MSTORE_SIZE.
 */
-boolean lampID_isWithin_MeanDiff(int meanDiff){
+boolean plugID_isWithin_MeanDiff(int meanDiff){
   boolean returnVal = true;
   
-  if(lampID_FirstMCyc_complete > 0){
+  if(plugID_FirstMCyc_complete > 0){
     long sum = 0;
     for(int i = 0; i < MSTORE_SIZE; i++){
-      sum += lampID_MCyc_Store[i];
+      sum += plugID_MCyc_Store[i];
     }
     int mean = sum / MSTORE_SIZE;
     for(int i = 0; i < MSTORE_SIZE; i++){
       if(returnVal &&
-          (lampID_MCyc_Store[i] < mean - meanDiff ||
-          lampID_MCyc_Store[i] > mean + meanDiff)){
+          (plugID_MCyc_Store[i] < mean - meanDiff ||
+          plugID_MCyc_Store[i] > mean + meanDiff)){
          returnVal = false;
       }
     }
@@ -76,10 +80,10 @@ boolean lampID_isWithin_MeanDiff(int meanDiff){
 }
 
 // returns the mean average of the measurment cycle
-int lampID_get_Mean(){
+int plugID_get_Mean(){
   long sum = 0;
   for(int i = 0; i < MSTORE_SIZE; i++){
-    sum += lampID_MCyc_Store[i];
+    sum += plugID_MCyc_Store[i];
   }
   return sum / MSTORE_SIZE;
 }

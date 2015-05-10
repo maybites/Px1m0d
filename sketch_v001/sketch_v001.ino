@@ -14,7 +14,7 @@
 */
 #define POLL_DELAY_MSEC   1
 
-/* Def for LampID */
+/* Def for plugId */
 // defines how many measurements for one cycle are needed
 #define MSTORE_SIZE 30
 // defines the maximum measurmement cycles 
@@ -28,7 +28,7 @@ typedef struct
      boolean pressed;
      boolean light;
      byte lampDir;
-     int lampId;
+     int plugId;
  }  plug_type;
 
 /**********************************
@@ -38,7 +38,7 @@ typedef struct
 plug_type plugs[64];
 
 /**********************************
-  LAMP ID - Analog Input Multiplex
+  PLUG ID - Analog Input Multiplex
 ***********************************
 
   The circuit
@@ -69,19 +69,19 @@ const byte MAddressPinB = 6;
 const byte MAddressPinC = 7;
  
 // storage of the measurement cycle
-int lampID_MCyc_Store[MSTORE_SIZE];
+int plugID_MCyc_Store[MSTORE_SIZE];
 // measurement cycle index
-int lampID_MCyc_index = 0;
+int plugID_MCyc_index = 0;
 // counter of completed measurement cycles
-int lampID_FirstMCyc_complete = 0;
+int plugID_FirstMCyc_complete = 0;
 // measurement active flag
-boolean lampID_MCyc_active = false;
+boolean plugID_MCyc_active = false;
 // lamp row to poll
-byte lampID_row;
+byte plugID_row;
 // lamp column to poll
-byte lampID_column;
+byte plugID_column;
 // last polling time
-unsigned long lampID_lastPollMSec;
+unsigned long plugID_lastPollMSec;
 
 
 /**********************************
@@ -128,9 +128,15 @@ unsigned int directionRow[8];
   LAMP LIGHT - Digital output 
 ***********************************/
 
-const byte OUT_ser  = 4;
-const byte OUT_sclk = 3;
-const byte OUT_rclk = 2;
+//Pin connected to rclk of 74HC595
+const byte OUT_latchPin = 4;
+//Pin connected to sclk of 74HC595
+const byte OUT_clockPin = 3;
+////Pin connected to ser of 74HC595
+const byte OUT_dataPin = 2;
+
+// storage for the written shift-outs
+unsigned int lightRow[8];
 
 /*************************
   LiquidCrystal Library
